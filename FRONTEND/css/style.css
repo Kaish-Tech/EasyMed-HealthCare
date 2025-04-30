@@ -1,0 +1,133 @@
+#navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+    position: relative;
+    z-index: 100;
+  }
+  
+  #navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  
+  #navbar li {
+    display: inline;
+  }
+  
+  #navbar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease-in-out, border-bottom 0.2s ease-in-out;
+  }
+  
+  #navbar a:hover {
+    color: #2563eb;
+    border-bottom: 2px solid #2563eb;
+  }
+  
+  @media (max-width: 768px) {
+    #navbar ul {
+      flex-direction: column;
+      align-items: flex-start;
+      background: #fff;
+      padding: 1rem;
+      gap: 1rem;
+    }
+  
+    #navbar li {
+      width: 100%;
+    }
+  
+    #navbar a {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  
+  /* ========== PATIENT DASHBOARD STYLE ========== */
+
+#container h2,
+#container h3 {
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+#container button[data-action],
+#patient-action-container button {
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  padding: 0.6rem 1.2rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+#container button[data-action]:hover,
+#patient-action-container button:hover {
+  background-color: #1d4ed8;
+}
+
+#patient-action-container form,
+#patient-action-container input,
+#patient-action-container button,
+#patient-action-container table {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 1rem auto;
+}
+
+#patient-action-container input {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+}
+
+#patient-action-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#patient-action-container th,
+#patient-action-container td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+#patient-action-container th {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+#searchResult p {
+  background: #f9fafb;
+  padding: 0.75rem;
+  border-left: 4px solid #2563eb;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  #patient-action-container form,
+  #patient-action-container input,
+  #patient-action-container button,
+  #patient-action-container table {
+    width: 100%;
+  }
+}
