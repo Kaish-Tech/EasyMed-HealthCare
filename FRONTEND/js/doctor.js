@@ -62,50 +62,77 @@ function addDoctorForm() {
         </form>
     `;
 
-    document.getElementById("addDoctorForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const newDoctor = Object.fromEntries(formData.entries());
+    let form = document.getElementById("addDoctorForm")
+    let input = document.querySelectorAll("input")
 
+    let handleSubmit=(e)=>{
+
+        e.preventDefault();
+        const payload = {};
+		input.forEach(inp => {
+			payload[inp.name] = inp.value;
+		});
         try {
-            const response = await fetch("http://localhost:8080/api/doctors/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newDoctor),
-            });
-            const result = await response.json();
-            alert("Doctor added!");
-        } catch (err) {
-            console.error("Add doctor failed", err);
+            (async ()=>{
+                const response = await fetch("http://localhost:8080/api/doctors/save", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+                const result = await response.json();
+                alert("Doctor added!");
+            })()
+        } 
+        catch (error) {
+            console.error("Error "+error);
+            alert(' error while adding doctor')
+            
         }
-    });
+
+    }
+    form.addEventListener("submit",handleSubmit);
 }
 
 // View All Doctors
-async function viewDoctors() {
+export function viewDoctors() {
     const container = document.getElementById("doctor-form-container");
-    container.innerHTML = "<h3>All Doctors</h3>";
+    container.innerHTML = `
+    <h3>All Doctors</h3>
+    <table id="patientsTable">
+		<thead>
+        	<tr>
+         		<th>ID</th>
+				<th>Name</th>
+				<th>Specialization</th>
+				<th>Email</th>
+				<th>Phone</th>
+        	</tr>
+		</thead>
+		<tbody id="tableBody"></tbody>
+	</table>
+    `;
 
     try {
-        const res = await fetch("http://localhost:8080/api/doctors/fetchAll");
-        const doctors = await res.json();
-        if (doctors.length === 0) {
-            container.innerHTML += "<p>No doctors found.</p>";
-            return;
-        }
+        (async ()=>{
+            const res = await fetch("http://localhost:8080/api/doctors/fetchAll");
+            const doctors = await res.json();
+            const tbody = document.querySelector("#tableBody")
+            tbody.innerHTML="";
+            doctors.forEach(doctor=>{
+                let row = `
+                <tr>
+					<td>${doctor.doctorId}</td>
+					<td>${doctor.doctorName}</td>
+					<td>${doctor.doctorSpecialization}</td>
+					<td>${doctor.doctorEmail}</td>
+					<td>${doctor.doctorPhone}</td>
+				</tr>
+                `;
+                tbody.innerHTML+=row
+            })
 
-        const list = doctors.map(doc => `
-            <div>
-				<p><strong>Id:</strong> ${doc.doctorId}</p>
-                <p><strong>Name:</strong> ${doc.doctorName}</p>
-                <p><strong>Specialization:</strong> ${doc.doctorSpecialization}</p>
-                <p><strong>Email:</strong> ${doc.doctorEmail}</p>
-                <p><strong>Phone:</strong> ${doc.doctorPhone}</p>
-                <hr>
-            </div>
-        `).join("");
+        })()
 
-        container.innerHTML += list;
     } catch (err) {
         console.error("Failed to fetch doctors", err);
     }
@@ -123,24 +150,33 @@ function searchById() {
         <div id="doctorSearchResult"></div>
     `;
 
-    document.getElementById("searchDoctorForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+    let doctorForm=document.getElementById("searchDoctorForm")
+    let resultDiv =  document.getElementById("doctorSearchResult");
+    let handleSubmit=(e)=>{
+
+        e.preventDefault()
         const doctorId = document.getElementById("searchDoctorId").value;
 
         try {
-            const res = await fetch(`http://localhost:8080/api/doctors/fetchDoctorById?doctorId=${doctorId}`);
-            const doc = await res.json();
+            (async ()=>{
 
-            document.getElementById("doctorSearchResult").innerHTML = `
+                const res = await fetch(`http://localhost:8080/api/doctors/fetchDoctorById?doctorId=${doctorId}`);
+            const doc = await res.json();
+           resultDiv.innerHTML = `
                 <p><strong>Name:</strong> ${doc.doctorName}</p>
-                <p><strong>Specialization:</strong> ${doc.specialization}</p>
-                <p><strong>Email:</strong> ${doc.email}</p>
-                <p><strong>Phone:</strong> ${doc.phone}</p>
+                <p><strong>Specialization:</strong> ${doc.doctorSpecialization}</p>
+                <p><strong>Email:</strong> ${doc.doctorEmail}</p>
+                <p><strong>Phone:</strong> ${doc.doctorPhone}</p>
             `;
-        } catch (err) {
-            document.getElementById("doctorSearchResult").innerText = "Doctor not found!";
+            })()
+            
+        } catch (error) {
+            console.error("Error "+error);
+            
         }
-    });
+    }
+    doctorForm.addEventListener("submit",handleSubmit)
+
 }
 
 // Update Doctor
@@ -151,32 +187,39 @@ function updateDoctor() {
         <form id="updateDoctorForm">
             <input type="number" name="doctorId" placeholder="Doctor ID" required>
             <input type="text" name="doctorName" placeholder="Name">
-            <input type="text" name="specialization" placeholder="Specialization">
-            <input type="email" name="email" placeholder="Email">
-            <input type="text" name="phone" placeholder="Phone">
+            <input type="text" name="doctorSpecialization" placeholder="Specialization">
+            <input type="email" name="doctorEmail" placeholder="Email">
+            <input type="text" name="doctorPhone" placeholder="Phone">
             <button type="submit">Update</button>
         </form>
     `;
 
-    document.getElementById("updateDoctorForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const id = formData.get("doctorId");
-        formData.delete("doctorId");
-        const updatedDoctor = Object.fromEntries(formData.entries());
+    let form = document.querySelector("form")
+    let inputs = document.querySelectorAll("input")
+    let handleSubmit=(e)=>{
+        e.preventDefault()
+        let updatedDoctor = {}
+        inputs.forEach((input)=>{
+            updatedDoctor[input.name]=input.value
+        })
+        let oldDoctorId = updatedDoctor.doctorId;
 
         try {
-            const res = await fetch(`http://localhost:8080/api/doctors/updateDoctorById?doctorId=${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedDoctor),
-            });
-            const data = await res.json();
-            alert("Doctor updated successfully");
-        } catch (err) {
-            console.error("Update failed", err);
+            (async ()=>{
+                const res = await fetch(`http://localhost:8080/api/doctors/updateDoctorById?oldDoctorId=${oldDoctorId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedDoctor),
+                });
+                const data = await res.json();
+                alert("Doctor updated successfully");
+            })()
+        } catch (error) {
+            console.error("Update failed", error);
         }
-    });
+
+    }
+    form.addEventListener("submit",handleSubmit)
 }
 
 // Delete Doctor
@@ -184,23 +227,31 @@ function deleteDoctor() {
     const container = document.getElementById("doctor-form-container");
     container.innerHTML = `
         <h3>Delete Doctor</h3>
-        <form id="deleteDoctorForm">
+        <form>
             <input type="number" id="deleteDoctorId" placeholder="Doctor ID" required>
             <button type="submit">Delete</button>
         </form>
     `;
 
-    document.getElementById("deleteDoctorForm").addEventListener("submit", async (e) => {
+    let form = document.querySelector("form")
+    let handleSubmit=(e)=>{
         e.preventDefault();
-        const id = document.getElementById("deleteDoctorId").value;
-
+        const doctorId = document.getElementById("deleteDoctorId").value;
         try {
-            await fetch(`http://localhost:8080/api/doctors/deleteDoctorById?doctorId=${id}`, {
-                method: "DELETE",
-            });
-            alert("Doctor deleted successfully");
-        } catch (err) {
-            console.error("Delete failed", err);
+            (async ()=>{
+
+                const res = await fetch(`http://localhost:8080/api/doctors/deleteDoctorById?doctorId=${doctorId}`, {
+                    method: "DELETE",
+                });
+                if (!res.ok) {
+					throw new Error("Failed to delete doctor");
+				}
+				alert("doctor deleted successfully");
+            })()
+        } catch (error) {
+            console.error("Delete failed", error);
         }
-    });
+    }
+    form.addEventListener("submit",handleSubmit)
+    
 }
