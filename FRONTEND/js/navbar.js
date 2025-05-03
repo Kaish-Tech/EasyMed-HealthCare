@@ -5,6 +5,7 @@ import home from "./home.js"
 import about from "./about.js"
 import patient from "./patient.js"
 import doctor from "./doctor.js"
+import billing from "./billing.js"
 const navbar=()=>{
 	return (`	<nav id="navbar">
 	            <ul>
@@ -29,7 +30,8 @@ export let bindingAllAnchor=()=>{
 		"/home":home,
 		"/about":about,
 		"/patient":patient,
-		"/doctor":doctor
+		"/doctor":doctor,
+		"/billing":billing
 	}
 	let handleClick = (e)=> {
 		e.preventDefault()

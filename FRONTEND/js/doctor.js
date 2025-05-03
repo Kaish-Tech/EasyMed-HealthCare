@@ -1,9 +1,3 @@
-/**
- * 
- */
-
-// doctor.js
-
 let doctor=()=> {
 	setTimeout(()=>{
 		bindingAllButton();
@@ -11,14 +5,14 @@ let doctor=()=> {
     
     return `
         <h2>Doctor Management</h2>
-        <div id="doctor-action-container">
+        <div id="action-container">
 		<button data-action="add">Add Doctor</button>
 		<button data-action="view">View Doctors</button>
 		<button data-action="search">Search Doctor</button>
 		<button data-action="update">Update Doctor</button>
 		<button data-action="delete">Delete Doctor</button>
         </div>
-        <div id="doctor-form-container"></div>
+        <div id="form-container"></div>
     `;
 
   
@@ -50,7 +44,7 @@ export function bindingAllButton() {
 
 // Add Doctor
 function addDoctorForm() {
-    const container = document.getElementById("doctor-form-container");
+    const container = document.getElementById("form-container");
     container.innerHTML = `
         <h3>Add Doctor</h3>
         <form id="addDoctorForm">
@@ -95,7 +89,7 @@ function addDoctorForm() {
 
 // View All Doctors
 export function viewDoctors() {
-    const container = document.getElementById("doctor-form-container");
+    const container = document.getElementById("form-container");
     container.innerHTML = `
     <h3>All Doctors</h3>
     <table id="patientsTable">
@@ -133,25 +127,26 @@ export function viewDoctors() {
 
         })()
 
-    } catch (err) {
-        console.error("Failed to fetch doctors", err);
+    } catch (error) {
+        console.error("Failed to fetch doctors", error);
+        alert('something went wrong')
     }
 }
 
 // Search Doctor
 function searchById() {
-    const container = document.getElementById("doctor-form-container");
+    const container = document.getElementById("form-container");
     container.innerHTML = `
         <h3>Search Doctor</h3>
         <form id="searchDoctorForm">
             <input type="number" id="searchDoctorId" placeholder="Doctor ID" required>
             <button type="submit">Search</button>
         </form>
-        <div id="doctorSearchResult"></div>
+        <div id="searchResult"></div>
     `;
 
     let doctorForm=document.getElementById("searchDoctorForm")
-    let resultDiv =  document.getElementById("doctorSearchResult");
+    let resultDiv =  document.getElementById("searchResult");
     let handleSubmit=(e)=>{
 
         e.preventDefault()
@@ -172,6 +167,7 @@ function searchById() {
             
         } catch (error) {
             console.error("Error "+error);
+            alert('doctor not found')
             
         }
     }
@@ -181,7 +177,7 @@ function searchById() {
 
 // Update Doctor
 function updateDoctor() {
-    const container = document.getElementById("doctor-form-container");
+    const container = document.getElementById("form-container");
     container.innerHTML = `
         <h3>Update Doctor</h3>
         <form id="updateDoctorForm">
@@ -216,6 +212,7 @@ function updateDoctor() {
             })()
         } catch (error) {
             console.error("Update failed", error);
+            alert('Error updating Doctor')
         }
 
     }
@@ -224,7 +221,7 @@ function updateDoctor() {
 
 // Delete Doctor
 function deleteDoctor() {
-    const container = document.getElementById("doctor-form-container");
+    const container = document.getElementById("form-container");
     container.innerHTML = `
         <h3>Delete Doctor</h3>
         <form>
@@ -250,8 +247,8 @@ function deleteDoctor() {
             })()
         } catch (error) {
             console.error("Delete failed", error);
+            alert("Error Deleting patient")
         }
     }
-    form.addEventListener("submit",handleSubmit)
-    
+    form.addEventListener("submit",handleSubmit) 
 }

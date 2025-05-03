@@ -4,12 +4,14 @@ let patient = () => {
 	})
 	return `
         <h2>Patient Module</h2>
+		<div id="action-container">
         <button data-action="add">Add Patient</button>
-        <button data-action="view">View All Patients</button>
-        <button data-action="search">Search Patient by ID</button>
+        <button data-action="view">View Patients</button>
+        <button data-action="search">Search Patient</button>
         <button data-action="update">Update Patient</button>
         <button data-action="delete">Delete Patient</button>
-        <div id="patient-action-container"></div>
+		</div>
+        <div id="form-container"></div>
     `
 }
 let bindingAllButton = (e) => {
@@ -37,7 +39,7 @@ export default patient
 
 
 export function addPatientForm() {
-	const container = document.getElementById("patient-action-container");
+	const container = document.getElementById("form-container");
 	container.innerHTML = `
         <h3>Add New Patient</h3>
         <form id="addPatientForm">
@@ -75,18 +77,17 @@ function addPatientFromBinding() {
 			})
 			let data = await res.json();
 			alert("Patient Added Successfully")
-			console.log(data)
 
 		} catch (error) {
 			console.error("Error:", error);
-			alert("Error adding patient")
+			alert("Error while adding patient")
 		}
 	}
 	form.addEventListener("submit", handleSubmit)
 }
 
 export function viewPatients() {
-	const container = document.getElementById("patient-action-container");
+	const container = document.getElementById("form-container");
 	container.innerHTML = `
 	<h3>All Patients</h3>
 	<table id="patientsTable">
@@ -126,6 +127,7 @@ export function viewPatients() {
 
 		})()
 	} catch (error) {
+		console.error("Failed to fetch patient", error);
 		alert('something went wrong')
 
 	}
@@ -133,18 +135,21 @@ export function viewPatients() {
 }
 
 export function searchById() {
-	const container = document.getElementById("patient-action-container");
+	const container = document.getElementById("form-container");
 	container.innerHTML = `
-        <h3>Search Patient by ID</h3>
+        <h3>Search Patient</h3>
+		<form>
         <input type="number" id="searchId" placeholder="Enter ID">
         <button id="searchBtn">Search</button>
+		</form>
         <div id="searchResult"></div>
     `;
 
-	let btn = document.querySelector("#searchBtn")
+	let form = document.querySelector("form")
 	let resultDiv = document.querySelector("#searchResult");
 
-	let handleClick = () => {
+	let handleSubmit = (e) => {
+		e.preventDefault()
 		let id = document.getElementById("searchId").value
 		try {
 			(async () => {
@@ -165,16 +170,17 @@ export function searchById() {
             `;
 			})()
 		} catch (error) {
+			console.error("Error "+error);
 			alert('patient not found')
 		}
 
 	}
-	btn.addEventListener("click", handleClick)
+	form.addEventListener("submit", handleSubmit)
 }
 
 
 export function updatePatient() {
-	const container = document.getElementById("patient-action-container");
+	const container = document.getElementById("form-container");
 	container.innerHTML = `
 		<h3>Update Patient</h3>
 		<form id="updateForm">
@@ -189,58 +195,61 @@ export function updatePatient() {
 	`;
 
 	let form = document.querySelector("form")
-	let handleSubmit=(e)=>{
+	let handleSubmit = (e) => {
 		e.preventDefault()
 		let inputs = document.querySelectorAll("input")
 
-		let updatedPatient={}
-		inputs.forEach((input)=>{
-			updatedPatient[input.name]=input.value
+		let updatedPatient = {}
+		inputs.forEach((input) => {
+			updatedPatient[input.name] = input.value
 		})
-		
-		let oldPatientId = updatedPatient.patientId;
-		
-		try {
-			(async ()=>{
 
-				let response = await fetch(`http://localhost:8080/api/patients/updatePatientById?oldPatientId=${oldPatientId}`,{
-					method:'PUT',
-					headers:{"Content-Type":"application/json"},
-					body:JSON.stringify(updatedPatient)
+		let oldPatientId = updatedPatient.patientId;
+
+		try {
+			(async () => {
+
+				let response = await fetch(`http://localhost:8080/api/patients/updatePatientById?oldPatientId=${oldPatientId}`, {
+					method: 'PUT',
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(updatedPatient)
 				})
-				if(!response.ok){
+				if (!response.ok) {
 					alert("failed to update patient")
 					throw new Error("Failed to update patient")
 				}
 				let data = await response.json()
 				alert('Patient updated successfully');
 			})()
-			
+
 		} catch (error) {
-			console.error("update error",error)
+			console.error("update error", error)
 			alert('Error updating patient')
 		}
 
 	}
-	form.addEventListener("submit",handleSubmit)
+	form.addEventListener("submit", handleSubmit)
 }
 
 export function deletePatient() {
-	const container = document.getElementById("patient-action-container");
+	const container = document.getElementById("form-container");
 	container.innerHTML = `
 		<h3>Delete Patient</h3>
+		<form>
 		<input type="number" id="deleteId" placeholder="Enter ID">
 		<button id="deleteBtn">Delete</button>
+		</form>
 	`;
 
-	let deleteBtn = document.querySelector("#deleteBtn")
-	let handleClick=()=>{
+	let form = document.querySelector("form")
+	let handleClick = (e) => {
+		e.preventDefault()
 		let patientId = document.getElementById("deleteId").value;
-		
+
 		try {
-			(async ()=>{
-				let response = await fetch(`http://localhost:8080/api/patients/deletePatientById?patientId=${patientId}`,{
-					method:"DELETE"
+			(async () => {
+				let response = await fetch(`http://localhost:8080/api/patients/deletePatientById?patientId=${patientId}`, {
+					method: "DELETE"
 				})
 				if (!response.ok) {
 					throw new Error("Failed to delete patient");
@@ -252,6 +261,6 @@ export function deletePatient() {
 			alert("Error deleting patient.");
 		}
 	}
-	deleteBtn.addEventListener("click",handleClick)
+	form.addEventListener("click", handleClick)
 }
 
