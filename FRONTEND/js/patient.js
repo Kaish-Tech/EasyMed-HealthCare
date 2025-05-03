@@ -242,7 +242,7 @@ export function deletePatient() {
 	`;
 
 	let form = document.querySelector("form")
-	let handleClick = (e) => {
+	let handleSubmit = (e) => {
 		e.preventDefault()
 		let patientId = document.getElementById("deleteId").value;
 
@@ -261,6 +261,6 @@ export function deletePatient() {
 			alert("Error deleting patient.");
 		}
 	}
-	form.addEventListener("click", handleClick)
+	form.addEventListener("submit", handleSubmit)
 }
 
