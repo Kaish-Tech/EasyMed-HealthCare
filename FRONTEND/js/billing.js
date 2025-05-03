@@ -21,8 +21,8 @@ let bindingAllButton = (e) => {
         "add": addBillingForm,
         "view": viewBills,
         "search": searchById,
-        // "update": updateBill,
-        // "delete": deleteBill
+        "update": updateBill,
+        "delete": deleteBill
     }
     let handleClick = (e) => {
         const action = e.target.getAttribute("data-action");
@@ -156,7 +156,7 @@ function searchById() {
 	let form = document.querySelector("form")
 	let resultDiv = document.querySelector("#searchResult");
 
-	let handleClick = (e) => {
+	let handleSubmit = (e) => {
 		e.preventDefault()
 		let id = document.getElementById("searchId").value
 		try {
@@ -184,6 +184,108 @@ function searchById() {
 		}
 
 	}
-	form.addEventListener("submit", handleClick)
+	form.addEventListener("submit", handleSubmit)
 }
 
+function updateBill() {
+	const container = document.getElementById("form-container");
+	container.innerHTML = `
+		<h3>Update Bill</h3>
+		<form >
+			<input type="number" name="billId" placeholder="Bill ID" required />
+            <input type="number" name="patient_id" placeholder="Patient ID" required />
+            <input type="number" name="appointment_id" placeholder="Appointment ID" />
+            <input type="date" name="billDate" required />
+            <input type="number" name="amount" placeholder="Amount" required />
+            <input type="text" name="paymentStatus" placeholder="Payment Status (e.g., Paid)" required />
+            <input type="text" name="paymentMethod" placeholder="Payment Method (e.g., UPI, Card)" required />
+            <button type="submit">Submit</button>
+        </form>
+	`;
+
+	let form = document.querySelector("form")
+	let handleSubmit = (e) => {
+		e.preventDefault()
+		let inputs = document.querySelectorAll("input")
+
+		let updatedBill = {}
+		inputs.forEach((input) => {
+			updatedBill[input.name] = input.value
+		})
+		const finalPayload = {
+			billId:updatedBill.billId,
+    		billDate: updatedBill.billDate,
+    		amount: parseFloat(updatedBill.amount),
+    		paymentStatus: updatedBill.paymentStatus,
+    		paymentMethod: updatedBill.paymentMethod,
+    		patient: {
+    			patientId: parseInt(updatedBill.patient_id)
+    		},
+    		appointment: updatedBill.appointment_id
+        		? { appointmentId: parseInt(updatedBill.appointment_id) }
+        		: {appointmentId:null}
+			};
+
+
+		let billId = updatedBill.billId;
+		console.log(billId);
+		console.log(updatedBill);
+		
+		
+		try {
+			(async () => {
+
+				let response = await fetch(`http://localhost:8080/api/bills/updateBillById?billId=${billId}`, {
+					method: 'PUT',
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(finalPayload)
+				})
+				if (!response.ok) {
+					alert("failed to update patient")
+					throw new Error("Failed to update bill")
+				}
+				let data = await response.json()
+				alert('Bill updated successfully');
+			})()
+
+		} catch (error) {
+			console.error("update error", error)
+			alert('Error updating Bill')
+		}
+
+	}
+	form.addEventListener("submit", handleSubmit)
+}
+
+function deleteBill() {
+	const container = document.getElementById("form-container");
+	container.innerHTML = `
+		<h3>Delete Patient</h3>
+		<form>
+		<input type="number" id="deleteId" placeholder="Enter ID">
+		<button id="deleteBtn">Delete</button>
+		</form>
+	`;
+
+	let form = document.querySelector("form")
+	let handleSubmit = (e) => {
+		e.preventDefault()
+		let billId = document.getElementById("deleteId").value;
+
+		try {
+			(async () => {
+				let response = await fetch(`http://localhost:8080/api/bills/deleteBillById?billId=${billId}`, {
+					method: "DELETE"
+				})
+				if (!response.ok) {
+					throw new Error("Failed to delete Bill");
+				}
+				alert("Bill deleted successfully");
+			})()
+		} catch (error) {
+			console.error("Delete error", error);
+			alert("Error deleting Bill.");
+		}
+	}
+	form.addEventListener("submit", handleSubmit)
+}
