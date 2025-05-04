@@ -22,9 +22,9 @@ let bindingAllButton = (e) => {
     let pageReloader = {
         "add": addAppointmentForm,
         "view": viewAppointments,
-        // "search": searchById,
-        // "update": updateAppointment,
-        // "delete": deleteAppointment
+        "search": searchById,
+        "update": updateAppointment,
+        "delete": deleteAppointment
     }
     let handleClick = (e) => {
         const action = e.target.getAttribute("data-action");
@@ -93,7 +93,7 @@ function addAppointmentForm() {
 	form.addEventListener("submit", handleSubmit)
 }
 
-export function viewAppointments() {
+function viewAppointments() {
 	const container = document.getElementById("form-container");
 	container.innerHTML = `
 	<h3>All Appointments</h3>
@@ -139,4 +139,147 @@ export function viewAppointments() {
 
 	}
 
+}
+
+function searchById() {
+	const container = document.getElementById("form-container");
+	container.innerHTML = `
+        <h3>Search Appointment</h3>
+		<form>
+        <input type="number" id="searchId" placeholder="Enter ID">
+        <button id="searchBtn">Search</button>
+		</form>
+        <div id="searchResult"></div>
+    `;
+
+	let form = document.querySelector("form")
+	let resultDiv = document.querySelector("#searchResult");
+
+	let handleSubmit = (e) => {
+		e.preventDefault()
+		let id = document.getElementById("searchId").value
+		try {
+			(async () => {
+				let response = await fetch(`http://localhost:8080/api/appointments/fetchAppointmentById?appointmentId=${id}`)
+				if (!response.ok) {
+					throw new Error("Patient not found");
+				}
+				let data = await response.json()
+
+				resultDiv.innerHTML = `
+				
+                <p><strong>Id:</strong> ${data.appointmentId}</p>
+                <p><strong>Appointment Date:</strong> ${data.appointmentDate}</p>
+                <p><strong>Appointment Time:</strong> ${data.appointmentTime}</p>
+                <p><strong>Reason:</strong> ${data.reason}</p>
+                <p><strong>Patient Id:</strong> ${data.patient.patientId}</p>
+                <p><strong>Doctor Id:</strong> ${data.doctor.doctorId}</p>
+            `;
+			})()
+		} catch (error) {
+			console.error("Error "+error);
+			alert('appointment not found')
+		}
+
+	}
+	form.addEventListener("submit", handleSubmit)
+}
+
+function updateAppointment() {
+	const container = document.getElementById("form-container");
+	container.innerHTML = `
+		<h3>Update Appointment</h3>
+		<form id="updateAppointmentForm">
+			<input type="number" name="appointmentId" placeholder="Appointment ID" required>
+            <input type="date" name="appointmentDate" placeholder="appointmentDate" required>
+            <input type="time" name="appointmentTime" placeholder="appointmentTime" required>
+            <input type="text" name="reason" placeholder="reason" required>
+
+            <input type="number" name="doctorId" placeholder="Doctor ID" required>
+
+            <input type="number" name="patientId" placeholder="Patient Id" required>
+
+            <button type="submit">Add Appointment</button>
+        </form>
+	`;
+
+	let form = document.querySelector("form")
+	let handleSubmit = (e) => {
+		e.preventDefault()
+		let inputs = document.querySelectorAll("input")
+
+		let payload = {}
+		inputs.forEach((input) => {
+			payload[input.name] = input.value
+		})
+		const updatedAppointment={
+            appointmentDate:payload.appointmentDate,
+            appointmentTime:payload.appointmentTime,
+            reason:payload.reason,
+            doctor:{
+                doctorId:parseInt(payload.doctorId)
+            },
+            patient:{
+                patientId:parseInt(payload.patientId)
+            }
+        }
+
+		let oldAppointmentId = payload.appointmentId;
+
+		try {
+			(async () => {
+
+				let response = await fetch(`http://localhost:8080/api/appointments/updateAppointmentById?oldAppointmentId=${oldAppointmentId}`, {
+					method: 'PUT',
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(updatedAppointment)
+				})
+				if (!response.ok) {
+					alert("failed to update patient")
+					throw new Error("Failed to update patient")
+				}
+				let data = await response.json()
+				alert('Patient updated successfully');
+			})()
+
+		} catch (error) {
+			console.error("update error", error)
+			alert('Error updating patient')
+		}
+
+	}
+	form.addEventListener("submit", handleSubmit)
+}
+
+export function deleteAppointment() {
+	const container = document.getElementById("form-container");
+	container.innerHTML = `
+		<h3>Delete Appointment</h3>
+		<form>
+		<input type="number" id="deleteId" placeholder="Enter ID">
+		<button id="deleteBtn">Delete</button>
+		</form>
+	`;
+
+	let form = document.querySelector("form")
+	let handleSubmit = (e) => {
+		e.preventDefault()
+		let appointmentId = document.getElementById("deleteId").value;
+
+		try {
+			(async () => {
+				let response = await fetch(`http://localhost:8080/api/appointments/deleteAppointmentById?appointmentId=${appointmentId}`, {
+					method: "DELETE"
+				})
+				if (!response.ok) {
+					throw new Error("Failed to delete patient");
+				}
+				alert("Appointment deleted successfully");
+			})()
+		} catch (error) {
+			console.error("Delete error", error);
+			alert("Error deleting Appointment.");
+		}
+	}
+	form.addEventListener("submit", handleSubmit)
 }
