@@ -29,12 +29,12 @@ export let bindingAllAnchor=()=>{
 	let allAnchor = document.querySelectorAll("a")
 	let container = document.querySelector("#container")
 	let pageReloader={
-		"/home":home,
-		"/about":about,
-		"/patient":patient,
-		"/doctor":doctor,
-		"/billing":billing,
-		"/appointment":appointment
+		"/EasyMed-HealthCare/home":home,
+		"/EasyMed-HealthCare/about":about,
+		"/EasyMed-HealthCare/patient":patient,
+		"/EasyMed-HealthCare/doctor":doctor,
+		"/EasyMed-HealthCare/billing":billing,
+		"/EasyMed-HealthCare/appointment":appointment
 	}
 	let handleClick = (e)=> {
 		e.preventDefault()
