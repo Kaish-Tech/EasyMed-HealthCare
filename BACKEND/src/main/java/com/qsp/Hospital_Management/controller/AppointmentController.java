@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,30 +27,40 @@ public class AppointmentController {
 	private AppointmentService appointmentService;
 	
 	@PostMapping("/save")
-	public Appointment saveAppointment(@RequestBody Appointment appointment) {
-		return appointmentService.saveAppointment(appointment);
+	public ResponseEntity<Appointment> saveAppointment(@RequestBody Appointment appointment) {
+		Appointment savedAppointment= appointmentService.saveAppointment(appointment);
+		return new ResponseEntity<>(savedAppointment,HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/fetchAll")
-	public List<Appointment> fetchAllAppointments(){
-		return appointmentService.fetchAllAppointments();
+	public ResponseEntity<List<Appointment>> fetchAllAppointments(){
+		List<Appointment> appointments= appointmentService.fetchAllAppointments();
+		return new ResponseEntity<>(appointments,HttpStatus.OK);
 	}
 	
 	@GetMapping("/fetchAppointmentById")
-	public Appointment fetchAppointmentById(@RequestParam Long appointmentId) {
-		return appointmentService.fetchAppointmentById(appointmentId);
+	public ResponseEntity<Appointment> fetchAppointmentById(@RequestParam Long appointmentId) {
+		Appointment appointment= appointmentService.fetchAppointmentById(appointmentId);
+		if(appointment!=null) {
+			return new ResponseEntity<>(appointment,HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	@DeleteMapping("/deleteAppointmentById")
-    public String deleteAppointmentById(@RequestParam Long appointmentId) {
+    public ResponseEntity<Appointment> deleteAppointmentById(@RequestParam Long appointmentId) {
         appointmentService.deleteAppointmentById(appointmentId);
-        return "Appointment deleted successfully.";
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Update appointment
     @PutMapping("/updateAppointmentById")
-    public Appointment updateAppointmentById(@RequestParam Long oldAppointmentId, @RequestBody Appointment newAppointment) {
-        return appointmentService.updateAppointmentById(oldAppointmentId,newAppointment);
+    public ResponseEntity<Appointment> updateAppointmentById(@RequestParam Long oldAppointmentId, @RequestBody Appointment newAppointment) {
+    	Appointment updatedAppointment= appointmentService.updateAppointmentById(oldAppointmentId,newAppointment);
+    	if(updatedAppointment!=null) {
+    		return new ResponseEntity<>(updatedAppointment,HttpStatus.OK);
+    	}
+    	return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/filterAppointmentByDate")

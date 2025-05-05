@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,28 +26,44 @@ public class BillingController {
 	private BillingService billingService;
 	
 	@PostMapping("/save")
-	public Billing saveBilling(@RequestBody Billing billing) {
-		return billingService.saveBilling(billing);
+	public ResponseEntity<Billing> saveBilling(@RequestBody Billing billing) {
+		Billing savedBill= billingService.saveBilling(billing);
+		return new ResponseEntity<>(savedBill,HttpStatus.CREATED);
 	}
 
 	@GetMapping("/fetchAll")
-	public List<Billing> getAllBillings() {
-		return billingService.getAllBillings();
+	public ResponseEntity<List<Billing>> getAllBillings() {
+		List<Billing> bill= billingService.getAllBillings();
+		return new ResponseEntity<>(bill,HttpStatus.OK);
 	}
 
+
 	@GetMapping("/fetchBillById")
-	public Billing getBillingById(@RequestParam Long billId) {
-		return billingService.getBillingById(billId);
+	public ResponseEntity<Billing> getBillingById(@RequestParam Long billId) {
+		Billing billing= billingService.getBillingById(billId);
+		if(billing!=null) {
+			return new ResponseEntity<>(billing, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping("/deleteBillById")
-	public boolean deleteBillingById(@RequestParam Long billId) {
-		return billingService.deleteBillingById(billId);
+	public ResponseEntity<Billing> deleteBillingById(@RequestParam Long billId) {
+		billingService.deleteBillingById(billId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PutMapping("/updateBillById")
-	public Billing updateBillingById(@RequestParam Long billId, @RequestBody Billing newBilling) {
-		return billingService.updateBillingById(billId, newBilling);
+	public ResponseEntity<Billing> updateBillingById(@RequestParam Long billId, @RequestBody Billing newBilling) {
+		Billing updatedBilling= billingService.updateBillingById(billId, newBilling);
+		if(updatedBilling!=null) {
+			return new ResponseEntity<>(updatedBilling, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@GetMapping("/billStatus")

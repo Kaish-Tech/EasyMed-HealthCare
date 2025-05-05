@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,31 +38,27 @@ public class DoctorController {
 	}
 	
 	@GetMapping("/fetchDoctorById")
-	public ResponseEntity<?> fetchDoctorById(@RequestParam Long doctorId ){
+	public ResponseEntity<Doctor> fetchDoctorById(@RequestParam Long doctorId ){
 		Doctor doctor = doctorService.fetchDoctorById(doctorId);
 		if(doctor!=null) {
-			return ResponseEntity.ok(doctor);
+			return new ResponseEntity<>(doctor,HttpStatus.OK);
 		}else {
-			return ResponseEntity.status(404).body("Doctor not found with id: "+doctorId);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 	@PutMapping("/updateDoctorById")
-    public ResponseEntity<?> updateDoctorById(@RequestParam Long oldDoctorId, @RequestBody Doctor updatedDoctor) {
-        Doctor doctor = doctorService.updateDoctorById(oldDoctorId, updatedDoctor);
-        if (doctor != null) {
-            return ResponseEntity.ok(doctor);
+    public ResponseEntity<Doctor> updateDoctorById(@RequestParam Long oldDoctorId, @RequestBody Doctor newDoctor) {
+        Doctor updatedDoctor = doctorService.updateDoctorById(oldDoctorId, newDoctor);
+        if (updatedDoctor != null) {
+            return new ResponseEntity<>(updatedDoctor,HttpStatus.OK);
         } else {
-            return ResponseEntity.status(404).body("Doctor not found with ID: " + oldDoctorId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 	@DeleteMapping("/deleteDoctorById")
     public ResponseEntity<String> deleteDoctorById(@RequestParam Long doctorId) {
-        boolean deleted = doctorService.deleteDoctorById(doctorId);
-        if (deleted) {
-            return ResponseEntity.ok("Doctor deleted successfully.");
-        } else {
-            return ResponseEntity.status(404).body("Doctor not found with ID: " + doctorId);
-        }
+        doctorService.deleteDoctorById(doctorId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 	@GetMapping("/filterBySpecialization")
 	public List<Doctor> filterBySpecialization(@RequestParam String doctorSpecialization) {
