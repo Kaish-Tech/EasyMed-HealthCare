@@ -1,6 +1,3 @@
-/**
- * 
- */
 import navbar,{bindingAllAnchor} from "./navbar.js"
 let home=()=>{
 	setTimeout(()=>{
