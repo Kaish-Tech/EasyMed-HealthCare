@@ -45,8 +45,14 @@ export function bindLoginForm(){
                 console.log(data)
                 if(data.token){
                     alert(`${data.message}`)
+                    const sessionUser = {
+                        userId:data.user.userId,
+                        name:data.user.name,
+                        email:data.user.email,
+                        role:data.user.role
+                    }
                     window.sessionStorage.setItem("token",`${data.token}`) 
-                    window.sessionStorage.setItem("role",`${data.role}`)
+                    window.sessionStorage.setItem("user",JSON.stringify(sessionUser));
                     window.history.pushState(null,"","/home")
                     root.innerHTML = home()
                     }
